@@ -28,7 +28,7 @@ public class Driver {
 		//System.out.println(gib.toString());
 		
 		ArrayList<Guitar> git = (ArrayList<Guitar>)SerializeDemo.readObject("out.txt");
-		System.out.println(git.get(1).getCost());
+		System.out.println(git.get(0).getCost());
 		
 	}
 
