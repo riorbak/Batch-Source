@@ -1,6 +1,7 @@
 package com.revature.banking;
 
 import java.io.Serializable;
+import java.util.Random;
 
 /* Employees of the bank should be able to view all of their customers information
  * 	-This includes:
@@ -11,12 +12,12 @@ import java.io.Serializable;
  */
 public class Employee implements Serializable
 {	
-	/**
-	 * 
-	 */
+	Random rand = new Random();
+	
 	private static final long serialVersionUID = 1L;
 	private String employID;
 	private String employPass;
+	public int employNum;
 	
 	Employee()
 	{
@@ -27,6 +28,7 @@ public class Employee implements Serializable
 		super();
 		this.employID = employID;
 		this.employPass = employPass;
+		this.employNum = rand.nextInt(9999) + 1;		
 	}	
 	
 	//apply or deny account application method

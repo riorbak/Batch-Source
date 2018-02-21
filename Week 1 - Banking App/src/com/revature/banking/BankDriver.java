@@ -40,25 +40,17 @@ public class BankDriver
 	private static ArrayList<Employee> employees = new ArrayList<>();
 	private static ArrayList<Admin> admins = new ArrayList<>();
 	
-	private static boolean loggedIn,isCust, isEmp, isAdmin, progRunning;
+	private static boolean loggedIn,isCust, isEmp, isAdmin, progRunning, progTest;
 	private static Customer currCustomer;
 	private static Employee currEmployee;
 	private static Admin currAdmin;
 		
 	public static void main(String[] args) 
 	{		
-		progRunning = true;		//program running
-		
-//		loadCustomers();
-//		loadEmployees();
-//		loadAdmin();
-		
-		testCases();			//initialize testing data
-		
-		System.out.println("Welcome to the Bank of Boot.");
+		initializeBank();						//starts program loop and loads in data from files
 		
 		do
-		{	//log in loop
+		{										//-log in loop
 			while(!loggedIn && progRunning)		//while not logged in and program running
 			{
 				loginStartMenu();				// try to login
@@ -72,7 +64,7 @@ public class BankDriver
 			{
 				employeeMenu();					// open employee menu
 			}
-			else 								// otherwise
+			else if(isAdmin)					// otherwise
 			{
 				adminMenu();					// open admin menu
 			}
@@ -93,6 +85,7 @@ public class BankDriver
 					+ "\n  1) Customer Login"
 					+ "\n  2) Employee Login"
 					+ "\n  3) Exit Program");	
+			//check for input mismatch exceptions
 			try
 			{
 				System.out.print("\n Select One: ");
@@ -138,7 +131,7 @@ public class BankDriver
 					+ "\n  3)Go Back");
 			try
 			{
-				System.out.print("Select One: ");
+				System.out.print(" Select One: ");
 				choice = sc.nextInt();
 				sc.nextLine();
 			}
@@ -271,7 +264,7 @@ public class BankDriver
 					+ "\n  3)Go Back");
 			try
 			{
-				System.out.print("Select One: ");
+				System.out.print(" Select One: ");
 				choice = sc.nextInt();
 				sc.nextLine();
 			}
@@ -467,7 +460,7 @@ public class BankDriver
 		{		
 			try
 			{	//show user options
-				System.out.print("Get to work Drone " + currEmployee.getEmployID()+ ": "
+				System.out.print("\nGet to work Drone #" + currEmployee.employNum + ": "
 						+ "\nPlease make a selection: "
 						+ "\n 1) Lookup Customer"
 						+ "\n 2) Logout"
@@ -508,7 +501,7 @@ public class BankDriver
 		{		
 			try
 			{	//output admin options
-				System.out.print("All hail the glorious one, " + currEmployee.getEmployID()+ "! "
+				System.out.print("\nAll hail the glorious one, " + currAdmin.getEmployID()+ "! "
 						+ "\nWhat would you like to do, milord?: "
 						+ "\n 1) Lookup Customer"
 						+ "\n 2) Logout"
@@ -892,44 +885,77 @@ public class BankDriver
 		
 		return 0;		
 	}
-		//save/load data to/from file
-
-	private static void loadAdmin() 
+	
+	//start main loop and check if testing
+	private static void initializeBank()
 	{
-		admins = (ArrayList<Admin>) IO.readObject(adminData);
-	}
-	private static void saveAdmin()
-	{
-		IO.writeObject(admins, adminData);
-	}
-
-	private static void loadEmployees() 
-	{
-		employees = (ArrayList<Employee>) IO.readObject(employeeData);
-	}
-	private static void saveEmployees()
-	{
-		IO.writeObject(employees, adminData);
+		System.out.println("\nWelcome to the Bank of Boot.\n");
+		progRunning = true;			//program running
+		
+		if(!progTest)				//test cases loaded in the 
+		{
+			loadData();
+		}
+		else
+			testCases();
+		
+		
 	}
 	
-	private static void loadCustomers() 
+	//save/load data to/from file
+	@SuppressWarnings("unchecked")
+	private static void loadData()
 	{
-		customers = (ArrayList<Customer>) IO.readObject(customerData);
+		
+		if(IO.checkForData(customerData))				//if customer data exists, load em up
+		{
+			customers = (ArrayList<Customer>) IO.readObject(customerData);
+			System.out.println("Loaded customer data");
+		}
+		else											//else, start from scratch
+			System.out.println("No customers to load. Start an ad campaign or something!");	
+		
+		if(IO.checkForData(employeeData))				//if employee data exists, load em up
+		{
+			employees = (ArrayList<Employee>) IO.readObject(employeeData);
+			System.out.println("Loaded employee data");
+		}
+		else											//otherwise, add default employee
+		{
+			System.out.println("\nEmployee Data not found. Loading default emp.");
+			Employee emp = new Employee("emp", "emp");
+			employees.add(emp);
+		}
+		
+		if(IO.checkForData(adminData))					//if admin data exists, load em up
+		{
+			admins = (ArrayList<Admin>) IO.readObject(adminData);
+			System.out.println("Loaded admin data");
+		}
+		else											//otherwise, add default admin
+		{
+			System.out.println("\nAdmin Data not found. Loading default admin.");
+			Admin ad = new Admin("admin", "admin");
+			admins.add(ad);
+			
+		}
+		
+			
 	}
-	private static void saveCustomers()
+	private static void saveData()
 	{
+		IO.writeObject(admins, adminData);
+		IO.writeObject(employees, employeeData);
 		IO.writeObject(customers, customerData);
 	}
-
+	
 	//exit program
 	public static void exitProgram()
 	{
 		progRunning = false;		//end program running loop
 		
-//		saveCustomers();
-//		saveEmployees();
-//		saveAdmin();
-									//farewell to customer
+		saveData();					//save data
+									
 		System.out.println("\nThank you for using Bank of Boot. Please come again.");
 		
 		sc.close();					//close scanner
@@ -939,32 +965,40 @@ public class BankDriver
 	//debug test code
 	public static void testCases()
 	{
-		//Create customer with no accounts active
-		Customer c1 = new Customer("Matt", "n/a", "boot", "test1");
-		c1.setAccActive(false);
+		//ask if you want to run tests
+		System.out.print("Run Test Case Scenario? Y/N :");
 		
-		//create customer with 2 accounts
-		Customer c2 = new Customer("Mary", "555-555-5555", "SheepGurl", "test2");
-		Account a2 = new Account(50000);
-		a2.setAccountNum();
-		Account a3 = new Account(4000);
-		a3.setAccountNum();
-		c2.addAccount(a2);
-		c2.addAccount(a3);
-		
-		//add them to the customers list
-		customers.add(c1);
-		//System.out.println(c1.toString());
-		customers.add(c2);
-		//System.out.println(c2.toString());
-		
-		//create new employee
-		Employee emp = new Employee("Test", "test");
-		employees.add(emp);
-		
-		//create new admin
-		Admin ad = new Admin("Test", "test");
-		admins.add(ad);
-		
+		// if yes, add em in.
+		if(yesNoPrompt())
+		{		
+			//Create customer with no accounts active
+			Customer c1 = new Customer("boot", "test", "boot", "test1");
+			c1.setAccActive(false);
+			
+			//create customer with 2 accounts
+			Customer c2 = new Customer("test2", "555-555-5555", "test2", "test2");
+			Account a2 = new Account(50000);
+			a2.setAccountNum();
+			Account a3 = new Account(4000);
+			a3.setAccountNum();
+			c2.addAccount(a2);
+			c2.addAccount(a3);
+			
+			//add them to the customers list
+			customers.add(c1);
+			//System.out.println(c1.toString());
+			customers.add(c2);
+			//System.out.println(c2.toString());
+			
+			//create new employee
+			Employee emp = new Employee("emp", "emp");
+			employees.add(emp);
+			
+			//create new admin
+			Admin ad = new Admin("admin", "admin");
+			admins.add(ad);
+			
+		}
+
 	}
 }

@@ -14,7 +14,6 @@ public class Admin extends Employee
 	{
 		super();
 	}
-	
 	public Admin(String id, String pw)
 	{
 		this();

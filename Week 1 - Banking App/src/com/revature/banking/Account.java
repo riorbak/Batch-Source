@@ -5,9 +5,6 @@ import java.util.ArrayList;
 
 public class Account implements Serializable
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	static int folio = 10000;

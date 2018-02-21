@@ -1,14 +1,14 @@
 package com.revature.banking;
 
-import java.io.File;
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
 
 
 public class IO {
@@ -43,4 +43,29 @@ public class IO {
 		return s;
 	}
 	
+	public static boolean checkForData(String filename)
+	{
+		boolean success = true;
+		try
+		{	
+			BufferedReader br = new BufferedReader(new FileReader(filename));     
+			if (br.readLine() == null)
+			{
+				//System.out.println("No errors, and file empty");
+				success = false;
+			}
+			br.close();
+		}
+			catch (FileNotFoundException e) {
+				e.printStackTrace();
+		} 	catch (IOException e) {
+				e.printStackTrace();
+		}
+		
+		if(success)			
+			return true;
+		else
+			return false;
+		
+	}
 }

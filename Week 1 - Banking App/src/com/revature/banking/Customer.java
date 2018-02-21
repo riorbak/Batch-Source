@@ -14,9 +14,6 @@ import java.util.InputMismatchException;
  */
 public class Customer implements Serializable
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	//User info
 	private String username;
@@ -383,7 +380,6 @@ public class Customer implements Serializable
 	}
 	
 	//setters and getters
-	//getters and setters
 	public String getUsername() {
 		return username;
 	}
@@ -424,9 +420,7 @@ public class Customer implements Serializable
 	}
 	public void setAccActive(boolean accActive) {
 		this.accActive = accActive;
-	}
-
-	
+	}	
 
 	public ArrayList<Account> getAccounts() {
 		return accounts;
