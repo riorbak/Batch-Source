@@ -1,15 +1,11 @@
 package com.revature.JDBCBank;
 
-import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
 import org.apache.log4j.Logger;
 
-import com.revature.BankBeans.*;
-import com.revature.JDBCBank.old.Account;
-import com.revature.JDBCBank.old.BankDriver;
-import com.revature.JDBCBank.old.Customer;
+
 
 /*Build the application using Java 8
  * All interaction with the user should be done through the console using the Scanner class
@@ -38,16 +34,17 @@ public class BankDBDriver
 {		
 	public static final Scanner sc = new Scanner(System.in);
 	
-	static IO io = IO.getInstance();
-	static ConnFactory dbConn = ConnFactory.getInstance();
+	public static ConnFactory dbConn = ConnFactory.getInstance();
 	public static Logger log = Logger.getLogger(BankDBDriver.class.getName());
 	
+	//access User and SuperUser commands
 	private static UserDAOImpl userCmd;
-	private static SuperUserDAOImpl adminCmd;
+	private static SuperUserDAOImpl superCmd;
+	
 	
 	private static int currUser;
-	private static SuperUser currSuper;
 	
+	//loop flags
 	private static boolean loggedIn, isUser, isSuper, progRunning;
 		
 	public static void main(String[] args) 
@@ -146,6 +143,7 @@ public class BankDBDriver
 	public static void createNewUser()
 	{
 		String uName, password, rName, phNum;
+		sc.nextLine();
 		
 		//get user input for creating new User obj.
 		System.out.print("Please enter your name: ");
@@ -165,7 +163,7 @@ public class BankDBDriver
 				"\n Please record this information for your records.");
 		
 		//user constructor
-		adminCmd.createUser(rName, phNum, uName, password);
+		superCmd.createUser(rName, phNum, uName, password);
 	
 		isUser = true;				//flag the user is a user
 		loggedIn = true;			//end the log in loop
@@ -175,7 +173,8 @@ public class BankDBDriver
 	//user id and password prompt
 	public static void userLogin()
 	{
-		boolean searching = true;
+		boolean found = false;
+		boolean logging = true;
 		String n, p;
 		
 		do
@@ -186,10 +185,10 @@ public class BankDBDriver
 			System.out.print("Please enter your password: ");
 			p = sc.next();
 							
-			searching = userCmd.login(n, p);
+			found = userCmd.login(n, p);
 			
 			//if still looking for user
-			if(searching == true)		
+			if(found == false)		
 			{
 				//login info not found
 				System.out.print("\nInvalid username or password. "
@@ -200,36 +199,52 @@ public class BankDBDriver
 				else				//otherwise
 					break;			//break from loop to go back.
 			}
+			else
+			{
+				logging = false;
+				isUser = true;
+				loggedIn = true;
+			}
 		}
-		while (searching);
+		while (logging);
 	}	
 	
 	//superUser user name and pw prompt
 	public static void superUserLogin()
 	{
+		boolean found = false;
 		String admID, admPW;
 		
 		boolean logging = true;
 		do
-		{	//get user input
+		{	
+			sc.nextLine();
+			//get user input
 			System.out.print("Enter SuperUser ID: ");
 			admID = sc.nextLine();
 			
 			System.out.print("Enter password: ");
 			admPW = sc.nextLine();
 			
-			adminCmd.login(admID, admPW);
+			found = superCmd.login(admID, admPW);
 			
 			//if superUser not found, ask user if they want to try again.
-			if(logging == true)
+			if(found == false)		
 			{
-				System.out.print("\nInvalid username or password. " 
-						+ "Try again? Y/N ");
+				//login info not found
+				System.out.print("\nInvalid username or password. "
+						+ "\n  Try again? Y/N ");
 				
-				if(yesNoPrompt())
-					continue;
-				else
-					logging = false;
+				if(yesNoPrompt())	//if user wants to try again
+					continue;		// restart the loop
+				else				//otherwise
+					break;			//break from loop to go back.
+			}
+			else
+			{
+				logging = false;
+				isSuper = true;
+				loggedIn = true;
 			}
 			
 		}
@@ -241,6 +256,7 @@ public class BankDBDriver
 	{	
 		//set all log in variables to false
 		loggedIn = isUser = isSuper = false;
+		BankDBDriver.log.info ("UserID: " + "logged out"); 
 	}
 	
 	//show & select user menu options
@@ -272,22 +288,22 @@ public class BankDBDriver
 				userCmd.viewAccounts(getCurrUser());
 				break;
 			case 2:
-				applyForAccount(false);
+				applyForAccount(userCmd.checkAccountStatus(getCurrUser()), false);
 				break;
 			case 3:
-				applyForAccount(true);
+				applyForAccount(userCmd.checkAccountStatus(getCurrUser()), true);
 				break;
 			case 4:										//if 4, withdraw request
-				
+				userCmd.withdraw();
 				break;
 			case 5:										//if 5, deposit request
-				
+				userCmd.deposit();
 				break;
 			case 6:										//if 6, transfer request
-				
+				System.out.println("Not Yet Implemented. Please try again.");
 				break;	
 			case 7:										//if 7, close an account
-				
+				userCmd.deleteAccount(getCurrUser());
 				break;
 			case 8:
 				logout();								//if 8, logout and go back to login top menu
@@ -302,52 +318,32 @@ public class BankDBDriver
 		
 	}
 		
-	private static void applyForAccount(boolean isJoint)
+	private static void applyForAccount(boolean hasApp, boolean isJoint)
 	{
-		if(appForAcc == true)
+		if(hasApp == true)
 		{
 			System.out.print("You currently have an application pending. Please wait until the previous application"
-					+ "\n   is processed. Thank you for your patience.");
+					+ "\n   is processed. Thank you for your patience.\n");
 		}
 		else
-		{		
-			appForAcc = true;
-			
+		{					
 			double cash;
-			ArrayList<Customer> accountHolders = new ArrayList<>();
-			accountHolders.add(this);
 			
-			BankDriver.sc.nextLine();
+			sc.nextLine();
 			
 			System.out.print("You have requested a new account. "
 					+ "\n Please enter the starting capital of the account: ");
-			cash = BankDriver.checkDoubleInput();
-			
-			requestInfo = new Account(cash);
+			cash = checkDoubleInput();
 			
 			if(isJoint)
 			{
-				BankDriver.sc.nextLine();
-				
-				String name, phone;
-				System.out.print("This is a joint account application. Please provide information "
-						+ "\n about the person you are sharing the account with:"
-						+ "\n -Name: ");
-				name = BankDriver.sc.nextLine();
-				System.out.print(" -Phone: ");
-				phone = BankDriver.sc.nextLine();
-				
-				Customer jointCust = new Customer(name, phone);
-				
-				accountHolders.add(this);
-				accountHolders.add(jointCust);
-								
-				requestInfo = new Account(cash, accountHolders, isJoint);
-				
+				System.out.println("This feature not yet implemented. Please look forward to it.");
 			}
 			
 			System.out.println("Your request will be process within 3 buisness days."
 					+ "\n  We will inform you when we reach a decision. Thank you for your patience.\n");
+			
+			userCmd.openAccount(cash, currUser, 0, 0);
 		}
 	}	
 
@@ -376,13 +372,13 @@ public class BankDBDriver
 			switch(choice)
 			{
 			case 1: 	
-				
+				createNewUser();
 				break;
 			case 2:
-				
+				superCmd.viewUsers();
 				break;
 			case 3:
-			
+				approveDenyAcc();
 				break;
 			case 4:
 				
@@ -397,7 +393,8 @@ public class BankDBDriver
 				
 				break;
 			case 8:
-				
+				logout();								//if 8, logout and go back to login top menu
+				looping = false;
 				break;
 			default:
 				System.out.println("Invalid Selection. Please try again.");
@@ -406,13 +403,25 @@ public class BankDBDriver
 		
 		}while(looping);
 	}
-	
-	
-	
-	
-	
-	
-	
+			
+	private static void approveDenyAcc() 
+	{
+		System.out.print("Please enter userID: ");
+		int u = checkIntInput();
+		
+		if(superCmd.checkAccountStatus(u))
+		{
+			System.out.print("Would you like to approve this account? Y|N ");
+			
+			if(yesNoPrompt())
+			{
+				superCmd.approveAccount(u);
+			}				
+		}	
+		else
+			System.out.println("No account applications submitted from this user.");
+	}
+
 	//ensure user input is y or n and only those
 	//loop statement that gets Y,y or N,n input
 	public static boolean yesNoPrompt()
@@ -506,6 +515,9 @@ public class BankDBDriver
 		progRunning = true;			//program running
 		
 		System.out.println("\n ==== Welcome to the Bank of Boot ====\n");
+		
+		userCmd = new UserDAOImpl();
+		superCmd = new SuperUserDAOImpl();
 	}
 	
 	//exit program
@@ -518,6 +530,8 @@ public class BankDBDriver
 		sc.close();					//close scanner
 	}
 
+	
+	//getters and setters
 	public static int getCurrUser() {
 		return currUser;
 	}
@@ -525,18 +539,6 @@ public class BankDBDriver
 	public static void setCurrUser(int currUser) {
 		BankDBDriver.currUser = currUser;
 	}
-
-	public static SuperUser getCurrSuper() {
-		return currSuper;
-	}
-
-	public static void setCurrSuper(SuperUser currSuper) {
-		BankDBDriver.currSuper = currSuper;
-	}
-
-	
-	//getters and setters
 	
 	
-
 }

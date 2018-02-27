@@ -9,4 +9,8 @@ public interface SuperUserDAO
 	public void updateUser();
 	
 	public void deleteUser(int UserID);
+
+	void viewUser(int userID);
+
+	void approveAccount(int userID);
 }

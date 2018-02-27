@@ -1,5 +1,6 @@
 package com.revature.JDBCBank;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,6 +8,7 @@ import java.sql.SQLException;
 
 public class UserDAOImpl implements UserDAO {
 
+	@Override
 	public boolean login(String usrName, String pwd)
 	{
 		try {
@@ -14,16 +16,20 @@ public class UserDAOImpl implements UserDAO {
 			
 			PreparedStatement findUsr;
 			
-			findUsr = con.prepareStatement("select * from BankUsers where UserName = ? AND UserPassword = ?");
+			findUsr = con.prepareStatement("select * from BankUsers where UserName = ? AND UserPwd = ?");
 			
 			findUsr.setString(1, usrName);
 			findUsr.setString(2, pwd);
 			
-			ResultSet rs = findUsr.executeQuery();  
+ 
+			ResultSet rs = findUsr.executeQuery();
 			
-			if(!rs.wasNull())
+			while(rs.next())
 			{  
 				BankDBDriver.setCurrUser(rs.getInt(1));
+				BankDBDriver.log.info ("UserID: " + rs.getInt(1) + " UserName: " + usrName + " logged in"); 
+				
+				con.close();
 				return true;
 			}
 			con.close();
@@ -40,24 +46,33 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public void viewAccounts(int userID) 
 	{
-		System.out.println("Current User Accounts:");
-		
 		try {
 			Connection con = ConnFactory.getConnection();
 			
 			PreparedStatement vwAcc;
 			
-			vwAcc = con.prepareStatement("select * from Account where userID = ? OR jointID = ?");
+			vwAcc = con.prepareStatement("select * from Accounts where UserID = ?");
 		
 			vwAcc.setInt(1, userID);        
-			vwAcc.setInt(2, userID);
 			
-			ResultSet rs = vwAcc.executeQuery();  
-			while(rs.next())
-			{  
-				System.out.println(rs.getInt(1) + " " + rs.getDouble(2) + " " +
-						rs.getInt(3) + " " + rs.getInt(4) + " " +
-						rs.getInt(5) + " " + rs.getInt(6));  			
+			vwAcc.executeQuery(); 
+			ResultSet rs = vwAcc.getResultSet();
+			
+			if(!rs.next())
+			{
+				System.out.println("User has no active accounts");
+			}
+			else
+			{
+				System.out.println("Current User Accounts:");
+				do
+				{  
+					System.out.println("Account Num: " + rs.getInt(1) + " | Account Bal: $" + rs.getDouble(2) 
+							+ " | Account Active: " + rs.getBoolean(4) );			
+				}
+				while(rs.next());
+				
+				BankDBDriver.log.info ("UserID: " + userID + " viewed accounts."); 
 			}
 			
 			con.close();
@@ -77,16 +92,16 @@ public class UserDAOImpl implements UserDAO {
 			
 			PreparedStatement opAcc;
 			
-			opAcc = con.prepareStatement("insert into Account values(IncAccNum.nextVal,?,?,?,?,?)");
+			opAcc = con.prepareStatement("insert into Accounts values(IncAccNum.nextVal,?,?,?,?,?)");
 		        
-			opAcc.setDouble(2, startBal); 
-			opAcc.setInt(3, userID);
-			opAcc.setInt(4, 0);
-			opAcc.setInt(5, isJoint);
-			opAcc.setInt(6, jointID);
+			opAcc.setDouble(1, startBal); 
+			opAcc.setInt(2, userID);
+			opAcc.setInt(3, 0);
+			opAcc.setInt(4, isJoint);
+			opAcc.setInt(5, jointID);
 			
-			int i=opAcc.executeUpdate();  
-			BankDBDriver.log.info(i+" records inserted"); 
+			opAcc.executeUpdate();  
+			BankDBDriver.log.info("UserID: " + userID + " applied for an account."); 
 			
 			con.close();
 		
@@ -98,7 +113,7 @@ public class UserDAOImpl implements UserDAO {
 	}
 
 	@Override
-	public void deleteAccount(int accNum, int accBal, int userID) 
+	public void deleteAccount(int userID) 
 	{
 		int an = 0;
 		boolean testing = true;
@@ -108,10 +123,13 @@ public class UserDAOImpl implements UserDAO {
 			System.out.println("Please enter the account number on the account you wish to close: ");
 			an = BankDBDriver.checkIntInput();
 			
-			double ab = checkAccount(an);
+			double bal = checkBalance(an);
 			
-			if(ab > 0)
-				System.out.println("Can only close empty account. $");
+			if(bal > 0)
+			{
+				System.out.println("Can only close an empty account. $");
+				testing = false;
+			}
 			else
 			{
 				try {
@@ -119,16 +137,18 @@ public class UserDAOImpl implements UserDAO {
 					
 					PreparedStatement delAcc;
 					
-					delAcc = con.prepareStatement("delete from Account where Acc_Num=? AND Acc_Bal=? AND UserID = ?");
+					delAcc = con.prepareStatement("delete from Accounts where Acc_Num = ?");
 					
-					delAcc.setInt(an, 1);
-					delAcc.
+					delAcc.setInt(1, an);
 					
-					int i=delAcc.executeUpdate();  
+					int i = delAcc.executeUpdate(); 
+					
 					System.out.println(i+" records deleted"); 
-					BankDBDriver.log.info(i+" records inserted");
+					BankDBDriver.log.info("Account: " + an + " deleted");
 					
 					con.close();
+					
+					testing = false;
 				
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
@@ -140,57 +160,217 @@ public class UserDAOImpl implements UserDAO {
 	}
 	
 	@Override
-	public double checkAccount(int accNum) 
+	public double checkBalance(int accNum) 
+	{
+		double bal;
+		try {
+			Connection con = ConnFactory.getConnection();
+			
+			PreparedStatement chAcc;
+			
+			chAcc = con.prepareStatement("select Acc_Bal from Accounts where Acc_Num = ?");
+		
+			chAcc.setInt(1, accNum);        
+			
+			ResultSet rs = chAcc.executeQuery();  
+			
+			if(rs.next())
+			{  
+				bal = (double)rs.getInt(1);
+				con.close();
+				return bal;
+			}			
+			else
+				con.close();
+		
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return 0;  
+	}
+	
+	@Override
+	public boolean checkAccountStatus(int userID)
 	{
 		try {
 			Connection con = ConnFactory.getConnection();
 			
 			PreparedStatement chAcc;
 			
-			chAcc = con.prepareStatement("select * from Account where Acc_Num = ?");
+			chAcc = con.prepareStatement("select * from Accounts where UserID = ?");
 		
 			chAcc.setInt(1, userID);        
-			chAcc.setInt(2, userID);
 			
-			ResultSet rs = chAcc.executeQuery();  
-			if(!rs.wasNull())
-			{  
-				System.out.println(rs.getInt(1) + " " + rs.getInt(2) + " " +
-						rs.getInt(3) + " " + rs.getInt(4) + " " +
-						rs.getInt(5) + " " + rs.getInt(6));  			
+			ResultSet rs = chAcc.executeQuery();  			
+
+			if(!rs.next())
+			{
+				System.out.println("User has no active accounts");
+				con.close();
 			}
-			
-			con.close();
-		
+			else
+			{
+				while(rs.next())
+				{
+					if(rs.getInt(4) == 0)
+					{
+						con.close();
+						return true;
+					}
+				}
+			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}  
-		
+		}
+		return false;  		
 	}
-
+	
 	@Override
-	public void deposit() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void withdraw() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void transfer() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void logout() 
+	public int getAccNum()
 	{
-		//handled by driver
+		boolean testing = true;
+		int ac = 0;
+		
+		do
+		{
+			System.out.print("Please enter account number: ");
+			ac = BankDBDriver.checkIntInput();
+			
+			try {
+				Connection con = ConnFactory.getConnection();
+				
+				PreparedStatement chAcc;
+				
+				chAcc = con.prepareStatement("select * from Accounts where Acc_Num = ?");
+			
+				chAcc.setInt(1, ac);        
+				
+				ResultSet rs = chAcc.executeQuery();  			
+
+				if(!rs.next())
+				{
+					System.out.println("Invalid Account Number");
+					con.close();
+				}
+				else
+				{
+					con.close();
+					testing = false;
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+		}while(testing);
+		
+		return ac;
+	}
+	
+	@Override
+	public void deposit() 
+	{
+		int an = getAccNum();
+		double depAmt = 0;
+		
+		if(checkAccountStatus(BankDBDriver.getCurrUser()))
+		{
+			System.out.print("Please enter the ammont you would like to deposit: $");
+			depAmt = BankDBDriver.checkDoubleInput();
+			
+			try {
+				Connection con = ConnFactory.getConnection();
+				
+				CallableStatement dep = con.prepareCall("{call deposit (?, ?}");
+				
+				dep.setInt(1, an);		
+				dep.setDouble(2, depAmt);        
+				
+				dep.execute();  
+				con.close();
+				BankDBDriver.log.info ("UserID: " + BankDBDriver.getCurrUser() + " deposited $" + depAmt + " into Account Num: " + an); 
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}		
+		}
+		else
+			System.out.println("No active accounts at this time. Please contact an admin.");
+	}
+
+	@Override
+	public void withdraw() 
+	{
+		int an = getAccNum();
+		double wdAmt = 0;
+
+		boolean gettingInput = true;
+	
+		double currBal = checkBalance(an);
+		
+		if(checkAccountStatus(BankDBDriver.getCurrUser()))
+		{
+			do		
+			{							
+				if(currBal > 0)
+				{							
+					System.out.print("Current balance: $" + currBal
+							+ "\n Enter the withdrawl ammount: ");
+					wdAmt = BankDBDriver.checkDoubleInput();
+					
+					if(wdAmt == 0)
+					{
+						System.out.println("--Operation aborted!--");
+						break;
+					}
+					
+					if(wdAmt <= currBal)
+					{
+						try 
+						{
+							Connection con = ConnFactory.getConnection();
+							
+							CallableStatement dep = con.prepareCall("{call withdrawl(?, ?)}");
+							
+							dep.setInt(1, an);		
+							dep.setDouble(2, wdAmt);        
+							
+							dep.execute();  
+							con.close();
+							
+							BankDBDriver.log.info ("UserID: " + BankDBDriver.getCurrUser() + " withdrew $" + wdAmt + " from Account Num: " + an); 			
+							
+						} catch (SQLException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}						
+						
+						gettingInput = false;
+					}
+					else
+						System.out.println("Invalid withdrawl ammount. " 
+								+ "\nPlease enter an ammount less than or equal to your total account balance.\n");
+				}	
+				else
+				{
+					System.out.println("Insufficient Funds. Withdrawl impossible at this time.");
+					gettingInput = false;
+				}
+			}
+			while(gettingInput);	
+		}
+		else
+			System.out.println("No active accounts at this time. Please contact admin.");
+	}
+
+	@Override
+	public void transfer() 
+	{
+		
+		
 	}
 
 }
