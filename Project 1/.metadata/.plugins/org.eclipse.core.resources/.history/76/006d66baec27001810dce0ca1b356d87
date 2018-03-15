@@ -1,0 +1,40 @@
+package com.revature.ERS.servlet;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.*;
+
+import com.revature.ERS.UserDAOImpl;
+
+public class UserInfoServlet extends HttpServlet {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		
+		HttpSession session = req.getSession();
+		
+		resp.setContentType("text/html");
+		
+		String username = req.getParameter("username");
+		
+		UserDAOImpl v = new UserDAOImpl();
+		
+		try
+		{			
+			v.viewInfo(username);
+			
+		}
+		catch (Exception e2) 
+		{
+			e2.printStackTrace();
+		}  
+
+	}
+
+}

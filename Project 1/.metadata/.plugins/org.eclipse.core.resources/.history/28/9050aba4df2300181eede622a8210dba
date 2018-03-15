@@ -1,0 +1,121 @@
+package com.revature.proj_01_ers;
+
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import com.revature.proj_01_ers.beans.Reimbursement;
+import com.revature.proj_01_ers.beans.User;
+
+public class EmployeeDAOImpl extends User implements EmployeeDAO 
+{
+	private static final long serialVersionUID = 1L;
+
+	public boolean login(String username, String password) throws SQLException
+	{		
+		ConnFactory.getInstance();
+		Connection conn = null;
+		PreparedStatement findUsr = null;
+		ResultSet rs = null;
+		
+		try {			
+			conn = ConnFactory.getConnection();			
+			findUsr = conn.prepareStatement("select * from BankUsers where UserName = ? AND UserPwd = ?");
+			
+			findUsr.setString(1, username);
+			findUsr.setString(2, password);			
+ 
+			rs = findUsr.executeQuery();			
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("An SQL exception occurred 503");
+		} finally {
+			if (findUsr != null)
+				findUsr.close();
+			if (conn != null)
+				conn.close();
+			
+			if (rs.next())
+				return true;
+		}
+		
+		return false;
+	}
+
+	public void logout() 
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void makeRequest(Reimbursement r) throws SQLException 
+	{
+		ConnFactory.getInstance();
+		Connection conn = null;
+		CallableStatement s = null;
+		String statement = "{CALL NEW_REIM_REQ(?,?,?,?,?,?)}";
+		
+		try {			
+			conn = ConnFactory.getConnection();			
+			s = conn.prepareCall(statement);
+			
+			s.setInt(1, r.getAmount());
+			s.setString(2, r.getDescription());
+			s.setByte(3, r.getReceipt());
+			s.setInt(4, r.getId());				//TODO: change to userID
+			s.setInt(5, r.getType());			
+
+			s.execute();			
+			
+		} catch (SQLException e) {
+			System.out.println("An SQL exception occurred 503");
+		} finally {
+			if (s != null)
+				s.close();
+			if (conn != null)
+				conn.close();
+		}
+		
+	}
+	
+	public void uploadReceipt() 
+	{
+		
+		
+	}
+
+	public void viewPending() 
+	{
+		
+		
+	}
+
+	public void viewResolved() 
+	{
+		
+		
+	}
+
+	public void viewInfo() 
+	{
+		
+		
+	}
+
+	public void updateInfo() 
+	{
+		
+		
+	}
+
+	public Reimbursement processRow(ResultSet rs) throws SQLException 
+	{
+		Reimbursement r = new Reimbursement();
+
+		return r;
+	}
+	
+}

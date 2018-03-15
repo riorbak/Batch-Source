@@ -1,0 +1,38 @@
+package com.revature.ERS;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import com.revature.ERS.beans.Reimbursement;
+//import com.revature.ERS.beans.User;
+
+public interface UserDAO 
+{
+	//-- Shared --//
+	public int login(String username, String password) throws SQLException;
+	
+	//-- Employee --//
+	
+	public void makeRequest(String username, Reimbursement r) throws SQLException;
+	public void uploadReceipt(String username) throws SQLException;
+	
+	public String viewPending(String username) throws SQLException;
+	public void viewResolved(String username) throws SQLException;
+	
+	public void viewInfo(String username) throws SQLException;
+	public void updateInfo(String username) throws SQLException;
+	
+	public Reimbursement processRow(ResultSet rs) throws SQLException;
+	
+	//-- Manager --//
+	
+	public void apprReq() throws SQLException;
+	public void denyReq() throws SQLException;
+	
+	// viewPending(String username) can be used from Employee 
+	public ResultSet viewAllPending() throws SQLException;
+	public void viewAllResolved() throws SQLException;
+	
+	public void viewEmployees() throws SQLException;
+	
+}

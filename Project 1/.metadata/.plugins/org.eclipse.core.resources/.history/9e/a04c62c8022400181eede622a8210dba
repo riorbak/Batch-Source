@@ -1,0 +1,38 @@
+package com.revature.ERS;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import com.revature.proj_01_ers.beans.Reimbursement;
+import com.revature.proj_01_ers.beans.User;
+
+public interface UserDAO 
+{
+	public int login(String username, String password) throws SQLException;
+	public void logout();
+	
+	/////////////////////////////
+	
+	public void makeRequest(Reimbursement r) throws SQLException;
+	public void uploadReceipt();
+	
+	public void viewPending();
+	public void viewResolved();
+	
+	public void viewInfo();
+	public void updateInfo();
+	
+	public Reimbursement processRow(ResultSet rs) throws SQLException;
+	
+	///////////////////////////////
+	
+	public void apprReq();
+	public void denyReq();
+	
+	public void viewPending(User u);
+	public void viewAllPending();
+	public void viewAllResolved();
+	
+	public void viewEmployees();
+	
+}

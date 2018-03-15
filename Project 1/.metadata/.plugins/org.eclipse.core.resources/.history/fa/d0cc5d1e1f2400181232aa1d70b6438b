@@ -1,0 +1,10 @@
+package com.revature.ERS;
+
+import org.apache.log4j.Logger;
+
+
+public class ERSDriver 
+{
+	public static ConnFactory dbConn = ConnFactory.getInstance();
+	public static Logger log = Logger.getLogger(ERSDriver.class.getName());
+}

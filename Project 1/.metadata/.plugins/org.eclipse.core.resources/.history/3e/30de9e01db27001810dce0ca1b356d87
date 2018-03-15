@@ -1,0 +1,84 @@
+package com.revature.ERS.beans;
+
+import java.io.Serializable;
+import java.sql.Blob;
+import java.sql.Timestamp;
+
+public class Reimbursement implements Serializable
+{
+	private static final long serialVersionUID = 1L;
+	
+	private int id;
+	private int amount; 
+	private String description;
+	private Blob receipt;
+	private int status;
+	private int type;
+	private Timestamp submitted;
+	private Timestamp resolved;
+	
+	
+	public Timestamp getSubmitted() {
+		return submitted;
+	}
+
+	public void setSubmitted(Timestamp submitted) {
+		this.submitted = submitted;
+	}
+
+	public Timestamp getResolved() {
+		return resolved;
+	}
+
+	public void setResolved(Timestamp resolved) {
+		this.resolved = resolved;
+	}
+
+	public Reimbursement()
+	{
+		super();
+	}
+	
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public int getAmount() {
+		return amount;
+	}
+	public void setAmount(int amount) {
+		this.amount = amount;
+	}
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	public Blob getReceipt() {
+		return receipt;
+	}
+	public void setReceipt(Blob receipt) {
+		this.receipt = receipt;
+	}
+	public int getStatus() {
+		return status;
+	}
+	public void setStatus(int status) {
+		this.status = status;
+	}
+	public int getType() {
+		return type;
+	}
+	public void setType(int type) {
+		this.type = type;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+	
+	
+	
+}

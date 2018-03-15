@@ -1,0 +1,88 @@
+package com.revature.proj_01_ers;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import com.revature.proj_01_ers.beans.User;
+
+public class EmployeeDAOImpl extends User implements EmployeeDAO 
+{
+	private static final long serialVersionUID = 1L;
+
+	public boolean login(String username, String password)
+	{
+		try {
+			Connection con = ConnFactory.getConnection();
+			
+			PreparedStatement findUsr;
+			
+			findUsr = con.prepareStatement("select * from BankUsers where UserName = ? AND UserPwd = ?");
+			
+			findUsr.setString(1, username);
+			findUsr.setString(2, password);
+			
+ 
+			ResultSet rs = findUsr.executeQuery();
+			
+			while(rs.next())
+			{  
+//				setCurrUser(rs.getInt(1));
+//				BankDBDriver.log.info ("UserID: " + rs.getInt(1) + " UserName: " + username + " logged in"); 
+				
+				con.close();
+				return true;
+			}
+			con.close();
+		
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}  		
+		return false;
+	}
+
+	public void logout() 
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void makeRequest() 
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void uploadReceipt() 
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void viewPending() 
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void viewResolved() 
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void viewInfo() 
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateInfo() 
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+}

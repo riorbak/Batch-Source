@@ -1,0 +1,133 @@
+package com.revature.proj_01_ers;
+
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import com.revature.proj_01_ers.beans.Reimbursement;
+import com.revature.proj_01_ers.beans.User;
+
+public class EmployeeDAOImpl extends User implements EmployeeDAO 
+{
+	private static final long serialVersionUID = 1L;
+
+	public boolean login(String username, String password)
+	{
+		try {
+			Connection con = ConnFactory.getConnection();
+			
+			PreparedStatement findUsr;
+			
+			findUsr = con.prepareStatement("select * from BankUsers where UserName = ? AND UserPwd = ?");
+			
+			findUsr.setString(1, username);
+			findUsr.setString(2, password);
+			
+ 
+			ResultSet rs = findUsr.executeQuery();
+			
+			while(rs.next())
+			{  
+//				setCurrUser(rs.getInt(1));
+//				BankDBDriver.log.info ("UserID: " + rs.getInt(1) + " UserName: " + username + " logged in"); 
+				
+				con.close();
+				return true;
+			}
+			con.close();
+		
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}  		
+		return false;
+	}
+
+	public void logout() 
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void makeRequest(Reimbursement r) throws SQLException 
+	{
+		ConnFactory.getInstance();
+		Connection conn = null;
+		CallableStatement s = null;
+		String statement = "{CALL NEW_REIM_REQ(?,?,?,?,?,?)}";
+		
+		try {			
+			conn = ConnFactory.getConnection();			
+			s = conn.prepareCall(statement);
+			
+			s.setInt(1, r.getAmount());
+			s.setString(2, r.getDescription());
+			s.setByte(3, r.getReceipt());
+			s.setInt(4, r.getId());				//TODO: change to userID
+			s.setInt(5, r.getType());
+			s.setInt(6, r.getStatus());
+			
+			
+
+			//s.execute();
+			
+			
+		} catch (SQLException e) {
+			System.out.println("An SQL exception occurred 503");
+		} finally {
+			if (s != null)
+				s.close();
+			if (conn != null)
+				conn.close();
+		}
+
+		
+		
+		/* 	create or replace PROCEDURE NEW_REIM_REQ 
+			( AMNT IN NUMBER, DESCRIPT IN VARCHAR2, RECIEPT IN BLOB,
+			    AUTH IN NUMBER, R_TYPE IN NUMBER , R_STATUS IN NUMBER ) 
+			  AS 
+			BEGIN
+			  INSERT INTO ERS_REIMBURSEMENTS VALUES(GEN_REIM_ID.NEXTVAL, AMNT, DESCRIPT, RECIEPT, T_SUBMIT, NULL,
+			    AUTH, NULL, R_TYPE, R_STATUS);
+			  COMMIT;
+			END NEW_REIM_REQ; 
+		 */
+		
+		
+		
+	}
+
+	public void uploadReceipt() 
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void viewPending() 
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void viewResolved() 
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void viewInfo() 
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateInfo() 
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+}

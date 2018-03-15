@@ -1,0 +1,36 @@
+package com.revature.proj_01_ers.servlet;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.*;
+
+public class LoginServlet extends HttpServlet {
+
+//	@Override
+//	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+//		HttpSession session = req.getSession();
+//		PrintWriter pw = resp.getWriter();
+//		resp.setContentType("text/html");
+//		req.getRequestDispatcher("00-login.html").include(req, resp);
+//	}
+	
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		
+		HttpSession session = req.getSession();
+		
+		resp.setContentType("text/html");
+		PrintWriter pw = resp.getWriter();
+		
+		String username = req.getParameter("username");
+		String password = req.getParameter("password");
+		
+		
+		
+		
+	}
+
+}
+

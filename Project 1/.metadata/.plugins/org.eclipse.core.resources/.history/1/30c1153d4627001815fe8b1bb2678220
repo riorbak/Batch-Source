@@ -1,0 +1,58 @@
+package com.revature.ERS.servlet;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Blob;
+import java.sql.SQLException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.sql.rowset.serial.SerialException;
+
+import com.revature.ERS.beans.Reimbursement;
+import com.revature.ERS.UserDAOImpl;
+
+public class ReimReqServlet extends HttpServlet{
+
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
+	{
+		HttpSession ses = req.getSession(false);
+		resp.setContentType("text/html");
+		
+		UserDAOImpl u = new UserDAOImpl();
+		Reimbursement r = new Reimbursement();
+		String userName = "test";
+		
+		if(ses != null)
+			userName = ses.getAttribute("username").toString();			
+		
+		r.setAmount( (int) Integer.parseInt(req.getParameter("amt")));
+		r.setType( (int) Integer.parseInt(req.getParameter("typ")));
+		r.setDescription(req.getParameter("desc"));
+		
+		byte[] b = req.getParameter("rcpt").getBytes();
+		Blob blo = null;
+		
+		try {
+			blo = new javax.sql.rowset.serial.SerialBlob(b);
+		} catch (SerialException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		if (blo != null)
+			r.setReceipt(blo);
+		
+		try {
+			u.makeRequest(userName, r);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+}

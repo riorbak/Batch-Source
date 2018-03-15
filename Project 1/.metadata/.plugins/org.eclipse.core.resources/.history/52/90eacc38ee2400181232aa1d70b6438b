@@ -1,0 +1,2 @@
+document.getElementById("myBtn").addEventListener("click", getJSON, false);
+document.getElementById("myBtn2").addEventListener("click", postPerson, false);

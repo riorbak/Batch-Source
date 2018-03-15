@@ -1,0 +1,11 @@
+127.0.0.1 - - [06/Mar/2018:15:46:41 -0500] "GET / HTTP/1.1" 404 1073
+0:0:0:0:0:0:0:1 - - [06/Mar/2018:15:46:42 -0500] "GET /ServletDemo/resources/ajax.js HTTP/1.1" 200 15
+0:0:0:0:0:0:0:1 - - [06/Mar/2018:15:52:07 -0500] "GET /ServletDemo/myFirstServlet HTTP/1.1" 404 1103
+0:0:0:0:0:0:0:1 - - [06/Mar/2018:15:52:35 -0500] "POST /ServletDemo/myFirstServlet HTTP/1.1" 404 1103
+0:0:0:0:0:0:0:1 - - [06/Mar/2018:15:53:53 -0500] "GET /ServletDemo/myFirstServlet HTTP/1.1" 404 1103
+0:0:0:0:0:0:0:1 - - [06/Mar/2018:15:54:46 -0500] "GET /ServletDemo/myFirstServlet HTTP/1.1" 404 1103
+0:0:0:0:0:0:0:1 - - [06/Mar/2018:15:56:26 -0500] "GET /ServletDemo/myfirstservlet HTTP/1.1" 200 -
+0:0:0:0:0:0:0:1 - - [06/Mar/2018:15:59:10 -0500] "POST /ServletDemo/bob HTTP/1.1" 404 1092
+0:0:0:0:0:0:0:1 - - [06/Mar/2018:15:59:15 -0500] "GET /ServletDemo/bob HTTP/1.1" 404 1092
+0:0:0:0:0:0:0:1 - - [06/Mar/2018:15:59:35 -0500] "GET /ServletDemo/bob HTTP/1.1" 200 -
+0:0:0:0:0:0:0:1 - - [06/Mar/2018:16:09:00 -0500] "POST /ServletDemo/bob HTTP/1.1" 200 -

@@ -1,0 +1,11 @@
+package com.revature.proj_01_ers;
+
+public interface ManagerDAO 
+{
+	public boolean login(String username, String password);
+	public void logout();
+	
+	
+	//public void newEmployee();
+	
+}

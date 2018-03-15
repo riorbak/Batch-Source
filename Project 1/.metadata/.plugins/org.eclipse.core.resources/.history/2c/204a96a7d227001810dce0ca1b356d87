@@ -1,0 +1,339 @@
+package com.revature.ERS;
+
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import com.revature.ERS.beans.Reimbursement;
+import com.revature.ERS.beans.User;
+
+public class UserDAOImpl extends User implements UserDAO 
+{
+	private static final long serialVersionUID = 1L;
+
+	public int login(String username, String password) throws SQLException
+	{		
+		Connection conn = null;
+		PreparedStatement findUsr = null;
+		
+		try {			
+			conn = ConnFactory.getConnection();			
+			findUsr = conn.prepareStatement("SELECT UR_ID FROM ERS_USERS WHERE U_USERNAME = ? AND U_PASSWORD = ?");
+			
+			findUsr.setString(1, username);
+			findUsr.setString(2, password);			
+ 
+			ResultSet rs = findUsr.executeQuery();	
+			
+			while(rs.next())
+			{
+				int role = rs.getInt(1);
+				
+//				System.out.println("User role: " + role);
+				
+				return role;
+			}			
+		} 
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+			System.out.println("An SQL exception occurred 503");
+		} 
+		finally 
+		{
+			if (findUsr != null)
+				findUsr.close();
+			if (conn != null)
+				conn.close();			
+		}
+		
+//		System.out.println("User not found");		
+		return -1;
+	}
+
+	public void makeRequest(String username, Reimbursement r) throws SQLException 
+	{
+		System.out.println("makeRequest Called");
+		
+		ConnFactory.getInstance();
+		Connection conn = null;
+		CallableStatement s = null;
+		String statement = "{CALL NEW_REIM_REQ(?,?,?,?,?)}";
+		
+		try {			
+			conn = ConnFactory.getConnection();			
+			s = conn.prepareCall(statement);
+			
+			
+			s.setInt(1, r.getAmount());
+			s.setString(2, r.getDescription());
+			s.setBlob(3, r.getReceipt());
+			s.setString(4, username);			
+			s.setInt(5, r.getType());			
+
+			s.execute();			
+			
+		} catch (SQLException e) {
+			System.out.println("An SQL exception occurred 503");
+		} finally {
+			if (s != null)
+				s.close();
+			if (conn != null)
+				conn.close();
+		}
+		
+	}
+	
+	public void uploadReceipt(String username) throws SQLException
+	{
+		
+		
+	}
+
+	public String viewPending(String username) throws SQLException 
+	{
+		Connection conn = null;
+		PreparedStatement findPend = null;
+		ResultSet rs = null;
+		
+		try {			
+			conn = ConnFactory.getConnection();			
+			findPend = conn.prepareStatement("SELECT R_AMOUNT, R_DESCRIPTION, R_RECEIPT, R_SUBMITTED FROM ERS_REIMBURSEMENTS WHERE RT_STATUS = 0 AND U_ID_AUTHOR = "
+					+ "(SELECT U_ID FROM ERS_USERS WHERE U_USERNAME = ?)") ;
+			
+			findPend.setString(1, username);		
+ 
+			rs = findPend.executeQuery();	
+			
+			String reqData = "";
+			
+			while(rs.next())  
+			{  
+				reqData.concat("<tr><td>"+rs.getInt(1)+"</td><td>"+rs.getString(2) + "</td><td>"+rs.getBlob(3)+"</td><td>"+rs.getTimestamp(4)+"</td></tr>");  			                  
+			}  
+			reqData.concat("</table>"); 
+		
+		} 
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+			System.out.println("An SQL exception occurred 503");
+		} 
+		finally 
+		{
+			if (findPend != null)
+				findPend.close();
+			if (conn != null)
+				conn.close();			
+		}
+		return reqData;
+		
+	}
+
+	public void viewResolved(String username) throws SQLException 
+	{
+		Connection conn = null;
+		PreparedStatement findRes = null;
+		ResultSet rs = null;
+		
+		try {			
+			conn = ConnFactory.getConnection();			
+			findRes = conn.prepareStatement("SELECT * FROM ERS_REIMBURSEMENTS WHERE RT_STATUS != 0 U_ID_AUTHOR = "
+					+ "(SELECT U_ID FROM ERS_USERS WHERE U_USERNAME = ?");
+			
+			findRes.setString(1, username);		
+ 
+			rs = findRes.executeQuery();		
+		} 
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+			System.out.println("An SQL exception occurred 503");
+		} 
+		finally 
+		{
+			if (findRes != null)
+				findRes.close();
+			if (conn != null)
+				conn.close();			
+		}
+		
+	}
+
+	public void viewInfo(String username) throws SQLException 
+	{
+		Connection conn = null;
+		PreparedStatement findUsr = null;
+		
+		try {			
+			conn = ConnFactory.getConnection();			
+			findUsr = conn.prepareStatement("SELECT ERS_USERS.U_FIRSTNAME, ERS_USERS.U_LASTNAME, ERS_USERS.U_EMAIL, ERS_USER_ROLES.UR_ROLE FROM ERS_USERS LEFT JOIN ERS_USER_ROLES ON ERS_USERS.UR_ID = ERS_USER_ROLES.UR_ID WHERE U_USERNAME = ?");
+			
+			findUsr.setString(1, username);		
+ 
+			ResultSet rs = findUsr.executeQuery();	
+			
+			while(rs.next())
+			{
+				
+				
+			}			
+		} 
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+			System.out.println("An SQL exception occurred 503");
+		} 
+		finally 
+		{
+			if (findUsr != null)
+				findUsr.close();
+			if (conn != null)
+				conn.close();			
+		}
+		
+//		System.out.println("User not found");		
+		
+	}
+
+	public void updateInfo(String username) throws SQLException
+	{
+		
+		
+	}
+
+	//temp
+	public Reimbursement processRow(ResultSet rs) throws SQLException 
+	{
+		Reimbursement r = new Reimbursement();
+
+		return r;
+	}
+
+	public void apprReq() 
+	{
+		
+		
+	}
+
+	public void denyReq() 
+	{
+		
+		
+	}
+
+	public ResultSet viewAllPending() throws SQLException 
+	{
+		Connection conn = null;
+		PreparedStatement findAllPend = null;
+		ResultSet rs = null;
+		
+		try {			
+			conn = ConnFactory.getConnection();			
+			findAllPend = conn.prepareStatement("SELECT * FROM ERS_REIMBURSEMENTS WHERE RT_STATUS = ?");
+			
+			findAllPend.setInt(1, 0);		
+ 
+			rs = findAllPend.executeQuery();	
+			
+			return rs;
+		
+		} 
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+			System.out.println("An SQL exception occurred 503");
+		} 
+		finally 
+		{
+			if (findAllPend != null)
+				findAllPend.close();
+			if (conn != null)
+				conn.close();			
+		}
+	
+		return rs;
+	}
+
+	public void viewAllResolved() throws SQLException
+	{
+		Connection conn = null;
+		PreparedStatement findAllRes = null;
+		
+		String allResSt = "SELECT ERS_USERS.U_ID, ERS_USERS.U_USERNAME, ERS_REIMBURSEMENTS.R_AMMOUNT "
+				+ "FROM ERS_REIMBURSEMENTS "
+				+ "LEFT JOIN ERS_USERS ON ERS_USERS.U_ID = ERS_REIMBURSEMENTS.U_ID_RESOLVER "
+				+ "WHERE RT_STATUS != 0";
+		
+		try 
+		{			
+			conn = ConnFactory.getConnection();			
+			findAllRes = conn.prepareStatement(allResSt) ;	
+ 
+			ResultSet rs = findAllRes.executeQuery();	
+			
+			while(rs.next())
+			{
+				//TODO:
+			}
+		
+		} 
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+			System.out.println("An SQL exception occurred 503");
+		} 
+		finally 
+		{
+			if (findAllRes != null)
+				findAllRes.close();
+			if (conn != null)
+				conn.close();			
+		}
+		
+	}
+
+	public void viewEmployees() throws SQLException 
+	{
+		Connection conn = null;
+		PreparedStatement viewEmp = null;
+		
+		String allResSt = "SELECT U_ID, U_USERNAME, U_FIRSTNAME, U_LASTNAME, U_EMAIL FROM ERS_USERS "
+				+ "WHERE UR_ID = (SELECT UR_ID FROM ERS_USER_ROLES WHERE UR_ROLE = 'EMPLOYEE')";
+		
+		try 
+		{			
+			conn = ConnFactory.getConnection();			
+			viewEmp = conn.prepareStatement(allResSt) ;
+ 
+			ResultSet rs = viewEmp.executeQuery();	
+			
+			while(rs.next())
+			{
+				//TODO:
+			}
+		
+		} 
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+			System.out.println("An SQL exception occurred 503");
+		} 
+		finally 
+		{
+			if (viewEmp != null)
+				viewEmp.close();
+			if (conn != null)
+				conn.close();			
+		}
+		
+	}
+
+	public void viewPending(User u) throws SQLException
+	{
+		// TODO Auto-generated method stub
+		
+	}
+}
