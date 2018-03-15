@@ -58,7 +58,7 @@ public class ViewResolvedServlet extends HttpServlet {
 				
 				for(Reimbursement r : data)
 				{
-					pw.print("<tr><td>" + r.getAuthID() + "</td>" +
+					pw.print("<tr><td>" + r.getId() + "</td>" +
 							"<td>" + r.getAuthor() + "</td>" +
 							"<td>" + r.getAmount() + "</td>" + 
 							"<td>" + r.getType() + "</td>" +

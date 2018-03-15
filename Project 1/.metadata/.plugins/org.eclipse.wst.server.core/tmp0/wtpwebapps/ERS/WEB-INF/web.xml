@@ -84,4 +84,13 @@
     <url-pattern>/ViewAllEmpServlet</url-pattern>  
   </servlet-mapping>
   
+  <servlet>   
+    <servlet-name>AppDenyServlet</servlet-name>  
+    <servlet-class>com.revature.ERS.servlet.AppDenyServlet</servlet-class>  
+  </servlet>  
+  <servlet-mapping>  
+    <servlet-name>AppDenyServlet</servlet-name>  
+    <url-pattern>/AppDenyServlet</url-pattern>  
+  </servlet-mapping>
+  
 </web-app>

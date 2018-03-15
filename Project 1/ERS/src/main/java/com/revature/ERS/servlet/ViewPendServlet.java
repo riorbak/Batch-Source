@@ -20,6 +20,11 @@ import com.revature.ERS.beans.Reimbursement;
 
 public class ViewPendServlet extends HttpServlet
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
 	{		
@@ -61,7 +66,7 @@ public class ViewPendServlet extends HttpServlet
 				
 				for(Reimbursement r : data)
 				{
-					pw.print("<tr><td>" + r.getAuthID() + "</td>" +
+					pw.print("<tr><td class='reqID'>" + r.getId() + "</td>" +
 							"<td>" + r.getAuthor() + "</td>" +
 							"<td>" + r.getAmount() + "</td>" + 
 							"<td>" + r.getType() + "</td>" +

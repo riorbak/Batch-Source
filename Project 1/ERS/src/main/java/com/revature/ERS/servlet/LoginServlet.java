@@ -8,6 +8,7 @@ import javax.servlet.http.*;
 
 import com.revature.ERS.UserDAOImpl;
 
+@SuppressWarnings("serial")
 public class LoginServlet extends HttpServlet {
 	
 	@Override

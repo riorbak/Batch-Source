@@ -1,0 +1,46 @@
+package com.revature.ERS.servlet;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.json.JSONObject;
+
+import com.revature.ERS.UserDAOImpl;
+
+public class ApprDenyServlet extends HttpServlet{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Override
+	protected void doPost (HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		
+		System.out.println("DEBUG: App/Deny called");
+		resp.setContentType("text/html");
+		
+		JSONObject json = new JSONObject(req.getParameter("obj"));
+		          
+		try{  	   		
+			UserDAOImpl usr = new UserDAOImpl();
+			
+			usr.apprDenyReq((int) json.get("reimID"), (int) json.get("appDen"));
+			
+			resp.sendRedirect("13-ViewAllPending.html");
+		}
+		catch (Exception e2) 
+		{
+			e2.printStackTrace();
+		}  
+		          
+	}
+	
+	protected void doGet (HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		this.doPost(req, resp);
+	}
+}

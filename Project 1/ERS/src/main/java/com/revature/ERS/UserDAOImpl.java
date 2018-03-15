@@ -260,15 +260,31 @@ public class UserDAOImpl extends User implements UserDAO
 	}
 
 
-	public void apprReq() 
+	public void apprDenyReq(String username, int reqID, int apDn) throws SQLException
 	{
+		ConnFactory.getInstance();
+		Connection conn = null;
+		CallableStatement s = null;
+		String statement = "{CALL APP_DENY(?,?,?)}";
 		
-		
-	}
-
-	public void denyReq() 
-	{
-		
+		try {			
+			conn = ConnFactory.getConnection();			
+			s = conn.prepareCall(statement);
+			
+			s.setInt(1, reqID);
+			s.setInt(2, apDn);
+			s.setString(3, username);
+			
+			s.execute();			
+			
+		} catch (SQLException e) {
+			System.out.println("An SQL exception occurred 503");
+		} finally {
+			if (s != null)
+				s.close();
+			if (conn != null)
+				conn.close();
+		}
 		
 	}
 
@@ -282,10 +298,11 @@ public class UserDAOImpl extends User implements UserDAO
 		try {			
 			conn = ConnFactory.getConnection();			
 			findPend = conn.prepareStatement("SELECT ERS_REIMBURSEMENTS.R_AMOUNT, ERS_REIMBURSEMENT_TYPE.RT_TYPE, ERS_USERS.U_USERNAME, "
-					+ "ERS_REIMBURSEMENTS.U_ID_AUTHOR, ERS_REIMBURSEMENTS.R_DESCRIPTION, ERS_REIMBURSEMENTS.R_SUBMITTED, ERS_REIMBURSEMENTS.R_RECEIPT "
+					+ "ERS_REIMBURSEMENTS.R_ID, ERS_REIMBURSEMENTS.R_DESCRIPTION, ERS_REIMBURSEMENTS.R_SUBMITTED, ERS_REIMBURSEMENTS.R_RECEIPT "
 					+ "FROM ERS_REIMBURSEMENTS "
 					+ "LEFT JOIN ERS_REIMBURSEMENT_TYPE ON ERS_REIMBURSEMENTS.RT_TYPE = ERS_REIMBURSEMENT_TYPE.RT_ID "
-					+ "LEFT JOIN ERS_USERS ON ERS_REIMBURSEMENTS.U_ID_AUTHOR = ERS_USERS.U_ID WHERE RT_STATUS = 0");	
+					+ "LEFT JOIN ERS_USERS ON ERS_REIMBURSEMENTS.U_ID_AUTHOR = ERS_USERS.U_ID WHERE RT_STATUS = 0 "
+					+ "ORDER BY ERS_REIMBURSEMENTS.R_ID");	
  
 			rs = findPend.executeQuery();			
 			
@@ -296,7 +313,7 @@ public class UserDAOImpl extends User implements UserDAO
 				r.setAmount(rs.getInt(1));
 				r.setType(rs.getString(2));
 				r.setAuthor(rs.getString(3));
-				r.setAuthID(rs.getInt(4));
+				r.setId(rs.getInt(4));
 				r.setDescription(rs.getString(5));
 				r.setSubmitted(rs.getTimestamp(6));
 				if(rs.getBlob(7) != null)
@@ -331,7 +348,7 @@ public class UserDAOImpl extends User implements UserDAO
 		try {			
 			conn = ConnFactory.getConnection();			
 			findPend = conn.prepareStatement("SELECT ERS_REIMBURSEMENTS.R_AMOUNT, ERS_REIMBURSEMENT_TYPE.RT_TYPE, ERS_USERS.U_USERNAME, "
-					+ "ERS_REIMBURSEMENTS.U_ID_AUTHOR, ERS_REIMBURSEMENTS.R_DESCRIPTION, ERS_REIMBURSEMENTS.R_SUBMITTED, "
+					+ "ERS_REIMBURSEMENTS.R_ID, ERS_REIMBURSEMENTS.R_DESCRIPTION, ERS_REIMBURSEMENTS.R_SUBMITTED, "
 					+ "ERS_REIMBURSEMENTS.R_RESOLVED, ERS_REIMBURSEMENT_STATUS.RS_STATUS "
 					+ "FROM ERS_REIMBURSEMENTS "
 					+ "LEFT JOIN ERS_REIMBURSEMENT_TYPE ON ERS_REIMBURSEMENTS.RT_TYPE = ERS_REIMBURSEMENT_TYPE.RT_ID "
@@ -348,7 +365,7 @@ public class UserDAOImpl extends User implements UserDAO
 				r.setAmount(rs.getInt(1));
 				r.setType(rs.getString(2));
 				r.setAuthor(rs.getString(3));
-				r.setAuthID(rs.getInt(4));
+				r.setId(rs.getInt(4));
 				r.setDescription(rs.getString(5));
 				r.setSubmitted(rs.getTimestamp(6));
 				r.setResolved(rs.getTimestamp(7));

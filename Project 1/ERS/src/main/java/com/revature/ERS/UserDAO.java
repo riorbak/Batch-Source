@@ -20,11 +20,10 @@ public interface UserDAO
 	public User viewInfo(String username) throws SQLException;
 	public void updateInfo(User u) throws SQLException;
 	
-	//-- Manager --//
-	public void apprReq() throws SQLException;
-	public void denyReq() throws SQLException;
-	
+	//-- Manager --//	
 	public ArrayList<Reimbursement> viewAllPending() throws SQLException;
+	public void apprDenyReq(String u, int i, int j) throws SQLException;
+	
 	public ArrayList<Reimbursement> viewAllResolved() throws SQLException;
 	
 	public ArrayList<User> viewEmployees() throws SQLException;

@@ -1,0 +1,53 @@
+package com.revature.ERS.servlet;
+
+import java.io.FileReader;
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.json.JSONObject;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.revature.ERS.UserDAOImpl;
+import com.revature.ERS.beans.Reimbursement;
+
+public class AppDenyServlet extends HttpServlet{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Override
+	protected void doPost (HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		
+		System.out.println("DEBUG: App/Deny called");
+		resp.setContentType("application/json; charset=utf-8");
+		
+		Gson gson = new Gson();
+
+		String jsonInString = req.getParameter("obj");
+		Reimbursement r = gson.fromJson(jsonInString, Reimbursement.class);
+		          
+		try{  	   		
+			UserDAOImpl usr = new UserDAOImpl();
+			
+			usr.apprDenyReq(r.getId(), r.getStatusID());
+			
+			resp.sendRedirect("13-ViewAllPending.html");
+		}
+		catch (Exception e2) 
+		{
+			e2.printStackTrace();
+		}  
+		          
+	}
+	
+	protected void doGet (HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		this.doPost(req, resp);
+	}
+}

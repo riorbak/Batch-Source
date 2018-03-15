@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+  <display-name>ERS</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>00-login.html</welcome-file>
+    <welcome-file>login.html</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+
+  <servlet>   
+    <servlet-name>LoginServlet</servlet-name>  
+    <servlet-class>com.revature.ERS.servlet.LoginServlet</servlet-class>  
+  </servlet>  
+  <servlet-mapping>  
+    <servlet-name>LoginServlet</servlet-name>  
+    <url-pattern>/LoginServlet</url-pattern>  
+  </servlet-mapping>
+  
+  <servlet>   
+    <servlet-name>LogoutServlet</servlet-name>  
+    <servlet-class>com.revature.ERS.servlet.LogoutServlet</servlet-class>  
+  </servlet>  
+  <servlet-mapping>  
+    <servlet-name>LogoutServlet</servlet-name>  
+    <url-pattern>/LogoutServlet</url-pattern>  
+  </servlet-mapping>  
+  
+  <servlet>   
+    <servlet-name>ReimReqServlet</servlet-name>  
+    <servlet-class>com.revature.ERS.servlet.ReimReqServlet</servlet-class>  
+  </servlet>  
+  <servlet-mapping>  
+    <servlet-name>ReimReqServlet</servlet-name>  
+    <url-pattern>/ReimReqServlet</url-pattern>  
+  </servlet-mapping>
+  
+  <servlet>   
+    <servlet-name>ViewPendServlet</servlet-name>  
+    <servlet-class>com.revature.ERS.servlet.ViewPendServlet</servlet-class>  
+  </servlet>  
+  <servlet-mapping>  
+    <servlet-name>ViewPendServlet</servlet-name>  
+    <url-pattern>/ViewPendServlet</url-pattern>  
+  </servlet-mapping>
+  
+  <servlet>   
+    <servlet-name>ViewResolvedServlet</servlet-name>  
+    <servlet-class>com.revature.ERS.servlet.ViewResolvedServlet</servlet-class>  
+  </servlet>  
+  <servlet-mapping>  
+    <servlet-name>ViewResolvedServlet</servlet-name>  
+    <url-pattern>/ViewResolvedServlet</url-pattern>  
+  </servlet-mapping>
+  
+  <servlet>   
+    <servlet-name>UserInfoServlet</servlet-name>  
+    <servlet-class>com.revature.ERS.servlet.UserInfoServlet</servlet-class>  
+  </servlet>  
+  <servlet-mapping>  
+    <servlet-name>UserInfoServlet</servlet-name>  
+    <url-pattern>/UserInfoServlet</url-pattern>  
+  </servlet-mapping>
+  
+  <servlet>   
+    <servlet-name>UpdateInfoServlet</servlet-name>  
+    <servlet-class>com.revature.ERS.servlet.UpdateInfoServlet</servlet-class>  
+  </servlet>  
+  <servlet-mapping>  
+    <servlet-name>UpdateInfoServlet</servlet-name>  
+    <url-pattern>/UpdateInfoServlet</url-pattern>  
+  </servlet-mapping>
+  
+  <servlet>   
+    <servlet-name>ViewAllEmpServlet</servlet-name>  
+    <servlet-class>com.revature.ERS.servlet.ViewAllEmpServlet</servlet-class>  
+  </servlet>  
+  <servlet-mapping>  
+    <servlet-name>ViewAllEmpServlet</servlet-name>  
+    <url-pattern>/ViewAllEmpServlet</url-pattern>  
+  </servlet-mapping>
+  
+  <servlet>   
+    <servlet-name>ApprDenyServlet</servlet-name>  
+    <servlet-class>com.revature.ERS.servlet.ApprDenyServlet</servlet-class>  
+  </servlet>  
+  <servlet-mapping>  
+    <servlet-name>ApprDenyServlet</servlet-name>  
+    <url-pattern>/AppDenyServlet</url-pattern>  
+  </servlet-mapping>
+  
+</web-app>

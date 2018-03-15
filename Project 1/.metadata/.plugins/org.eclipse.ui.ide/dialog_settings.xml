@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
+		<item value="C:\Users\Bootler\Desktop\Revature\Java Code\Week 5\HibernateExample"/>
 		<item value="C:\Users\Bootler\Desktop\Revature\Java Code\OneHour"/>
 		<item value="C:\Users\Bootler\Desktop\Revature\Java Code\Week 4\ServletLoginApp"/>
 		<item value="C:\Users\Bootler\Desktop\Revature\Java Code"/>
@@ -118,7 +119,7 @@
 	</list>
 	<section name="CleanDialogSettings">
 		<item value="500" key="DIALOG_WIDTH"/>
-		<item value="false" key="TOGGLE_SELECTED"/>
+		<item value="true" key="TOGGLE_SELECTED"/>
 		<item value="401" key="DIALOG_HEIGHT"/>
 		<item value="1190" key="DIALOG_X_ORIGIN"/>
 		<item value="253" key="DIALOG_Y_ORIGIN"/>

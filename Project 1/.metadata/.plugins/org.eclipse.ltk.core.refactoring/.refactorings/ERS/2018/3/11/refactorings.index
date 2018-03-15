@@ -10,3 +10,5 @@
 1521087375351	Rename type 'ViewAllServlet'
 1521089388506	Encapsulate field 'author'
 1521090628175	Encapsulate field 'authID'
+1521151302883	Rename type 'ApprDenyServlet'
+1521153737540	Delete element
