@@ -67,7 +67,9 @@ public class ReimReqServlet extends HttpServlet{
 			e.printStackTrace();
 		}
 		
-		if( ((int) req.getAttribute("role")) == 0 )
+		int role = (int) ses.getAttribute("role");
+		
+		if( role == 0 )
 			resp.sendRedirect("01-EmployeeHome.html");
 		else
 			resp.sendRedirect("11-ManagerHome.html");
